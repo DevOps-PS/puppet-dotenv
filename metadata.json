@@ -1,6 +1,6 @@
 {
   "name": "bauerkirch-dotenv",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "author": "bauer-kirch",
   "summary": "Manage .env configuration files",
   "license": "Apache-2.0",
