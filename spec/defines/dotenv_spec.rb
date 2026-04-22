@@ -1,6 +1,7 @@
 require 'spec_helper'
 
 describe 'dotenv' do
+  let(:title) { '/opt/app/.env' }
   let(:params) do
     {
       entries: {
@@ -10,19 +11,33 @@ describe 'dotenv' do
     }
   end
 
-  on_supported_os.each do |os, os_facts|
-    context "on #{os}" do
-      let(:facts) { os_facts }
+  it { is_expected.to compile }
+  it do
+    is_expected.to contain_file('/opt/app/.env').with_content(<<-'EOS')
+# Managed by Puppet
 
-      let(:title) do
-        if facts[:osfamily] == 'windows'
-          'C:\app\.env'
-        else
-          '/opt/app/.env'
-        end
-      end
+APP_NAME="M-Pab"
+APP_DESC="Mental Pabulum"
+EOS
+  end
 
-      it { is_expected.to compile }
+  context 'when quoting_style is single' do
+    let(:params) do
+      {
+        entries: {
+          ANTIVIRUS_CLAMAV_PATH: '["/usr/bin/clamdscan"]',
+        },
+        quoting_style: 'single',
+      }
+    end
+
+    it { is_expected.to compile }
+    it do
+      is_expected.to contain_file('/opt/app/.env').with_content(<<-'EOS')
+# Managed by Puppet
+
+ANTIVIRUS_CLAMAV_PATH='["/usr/bin/clamdscan"]'
+EOS
     end
   end
 end
