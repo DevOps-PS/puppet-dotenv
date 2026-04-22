@@ -40,7 +40,11 @@ The `dotenv` defined type has the following attributes:
 
 ### dotenv function
 
-The `dotenv` function takes a Puppet hash of key-value entries as its sole parameter and returns a string that represents the corresponding `.env` file contents.
+The `dotenv` function takes a Puppet hash of key-value entries as its first parameter and an optional quoting style as its second parameter. It returns a string that represents the corresponding `.env` file contents.
+
+By default, values are written with double quotes to preserve the module's current output. If you prefer single-quoted output, pass `quoting_style => 'single'` to the defined type or `dotenv($entries, 'single')` to the function.
+
+When the chosen style would break the value, the function falls back to a safe escaped representation instead of emitting invalid syntax.
 
 Please see the last example below for a use case.
 
@@ -72,6 +76,33 @@ MYSQL_HOSTNAME="localhost"
 MYSQL_USERNAME="user"
 MYSQL_PASSWORD="secret"
 MYSQL_DATABASE="dbname"
+```
+
+If you prefer single-quoted output:
+
+```puppet
+dotenv { 'Web app config':
+  path           => '/var/www/app/.env',
+  mode           => '0400',
+  owner          => 'www-data',
+  group          => 'www-data',
+  quoting_style  => 'single',
+  entries        => {
+    'MYSQL_HOSTNAME' => 'localhost',
+    'MYSQL_USERNAME' => 'user',
+    'MYSQL_PASSWORD' => 'secret',
+    'MYSQL_DATABASE' => 'dbname',
+  },
+}
+```
+
+The resulting `.env` entries would be:
+
+```shell
+MYSQL_HOSTNAME='localhost'
+MYSQL_USERNAME='user'
+MYSQL_PASSWORD='secret'
+MYSQL_DATABASE='dbname'
 ```
 
 Manage a web application configuration file with entries looked up in Hiera:
